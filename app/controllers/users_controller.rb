@@ -3,6 +3,11 @@ class UsersController < ApplicationController
 	before_action :logged_in_user, only: [:index, :edit, :update, :destroy]
   	before_action :correct_user,   only: [:edit, :update]
   	before_action :admin_user,     only: :destroy
+
+
+  def index
+  	@users = User.paginate(page: params[:page])
+  end
   
 
   def show
@@ -40,11 +45,7 @@ class UsersController < ApplicationController
   	end
   end
 
-  def index
-
-  	@users = User.paginate(page: params[:page])
-  end
-
+  
 
   def destroy
     User.find(params[:id]).destroy
@@ -52,21 +53,7 @@ class UsersController < ApplicationController
     redirect_to users_url
   end
 
-  #Confirms a logged_in user.
-  def logged_in_user
-  	unless logged_in?
-  		store_location
-  		flash[:danger] = "Please log in."
-  		redirect_to login_url
-  	end
-  end
-
-  # Confirms the current user.
-  def correct_user
-  	@user = User.find(params[:id])
-  	recirect_to(root_url) unless current_user?(@user)
-  end
-
+  
   private
 
 
@@ -78,6 +65,23 @@ class UsersController < ApplicationController
   	# Confirms an admin user
 
   	def admin_user
+  		puts "current_user.admin: #{current_user.admin?}"
   		redirect_to(root_url) unless current_user.admin?
   	end
+
+  	#Confirms a logged_in user.
+  def logged_in_user
+  	unless logged_in?
+  		store_location
+  		flash[:danger] = "Please log in."
+  		redirect_to login_url
+  	end
+  end
+
+  # Confirms the current user.
+  def correct_user
+  	@user = User.find(params[:id])
+  	redirect_to(root_url) unless current_user?(@user)
+  end
+
 end
